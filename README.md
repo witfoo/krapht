@@ -1,4 +1,4 @@
-# KraphT Knowledge Graph From Triples
+# KraphT - Knowledge Graph From Triples
 
 WORK IN PROGRESS.  **Expect breaking changes until further notice.**
 
