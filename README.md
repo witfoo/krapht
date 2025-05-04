@@ -181,13 +181,13 @@ See `config/` for JSON configuration templates.
 
 ## Roadmap
 
-1. [] **Core Pipeline**: Basic pipeline with NATS integration
-2. [] **Triple Extraction**: Configurable extraction from structured events
-3. [] **Entity Resolution**: Entity resolution with local/global contexts
-4. [] **Rule Engine**: Pattern matching for triple streams
-5. [] **UI Components**: Configuration and visualization interfaces
-6. [] **Advanced Analytics**: Optional SQL and vector search integrations
-7. [] **Data Distribution Layer**: Advanced NATS patterns for aggregation and federation
+1. [ ] **Core Pipeline**: Basic pipeline with NATS integration
+2. [ ] **Triple Extraction**: Configurable extraction from structured events
+3. [ ] **Entity Resolution**: Entity resolution with local/global contexts
+4. [ ] **Rule Engine**: Pattern matching for triple streams
+5. [ ] **UI Components**: Configuration and visualization interfaces
+6. [ ] **Advanced Analytics**: Optional SQL and vector search integrations
+7. [ ] **Data Distribution Layer**: Advanced NATS patterns for aggregation and federation
 
 ---
 
