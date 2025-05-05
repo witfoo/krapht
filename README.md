@@ -97,7 +97,7 @@ KraphT runs as a fully functional unit on a single edge device with all componen
 ### Clone the Repo
 
 ```bash
-git clone https://github.com/c360studio/krapht.git
+git clone https://github.com/witfoo/krapht.git
 cd krapht
 ```
 
