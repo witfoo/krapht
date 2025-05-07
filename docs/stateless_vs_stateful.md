@@ -47,4 +47,4 @@ This separation provides several benefits in a NATS-based architecture:
 4. **Progressive Enhancement:** Basic extraction can happen locally, while advanced rule processing can occur where more resources are available
 5. **Data Flow Optimization:** Extractors can run close to data sources, reducing network requirements for raw data
 
-This design pattern aligns perfectly with NATS' pub-sub model, where stateless extractors publish triples that stateful rule engines subscribe to and process based on configured patterns.
+This design pattern aligns perfectly with NATS' streaming model, where stateless extractors publish triples that stateful rule engines subscribe to and process based on configured patterns.

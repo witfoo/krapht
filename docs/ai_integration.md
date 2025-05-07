@@ -104,7 +104,7 @@ Because KraphT is based on event streams (via NATS), LLMs or agents do not have 
 
 ## Summary
 
-KraphT’s design—modular, event-driven, and structurally explicit—is well-suited for integration with coding LLMs or AI agents. These integrations can occur through:
+KraphT’s design — modular, event-driven, and structurally explicit — is well-suited for integration with coding LLMs or AI agents. These integrations can occur through:
 
 - Rule generation or refinement
 - Triple augmentation or suggestion

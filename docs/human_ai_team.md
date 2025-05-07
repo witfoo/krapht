@@ -25,7 +25,7 @@ KraphT acts as a reasoning layer that makes human-authored logic actionable, obs
 - Visualize how entities evolve across time
 - Use rule matches as investigative leads, not decisions
 
-This design ensures that automation enhances—not replaces—human oversight. Analysts retain control, while the system handles the scale and precision that tools do best.
+This design ensures that automation enhances — not replaces — human oversight. Analysts retain control, while the system handles the scale and precision that tools do best.
 
 ## Summary
 
@@ -33,4 +33,4 @@ KraphT is a framework that amplifies human insight by embedding it in a system c
 
 ### Footnote
 
-- The word `Synergy` was not allowed to be used on this page.
+- The word `synergy` was not allowed to be used on this page.

@@ -1,10 +1,10 @@
 # Efficient Subject Routing in Triple-Based Architecture
 
-The triple-based architecture enables exceptionally efficient subject routing within NATS. Let's explore this benefit in greater detail:
+The triple-based architecture enables exceptionally efficient subject routing within NATS.
 
 ## Subject Hierarchy Design for Triples
 
-```
+```bash
 triple.<predicate>.<source>
 ```
 
@@ -13,17 +13,18 @@ This hierarchical structure provides several significant advantages:
 ### 1. Predicate-Based Subscription
 
 ```go
-// Subscribe to all authentication events regardless of source
-_, err := js.PullSubscribe("triple.authenticated_to.>", "AUTH_MONITOR")
+// Subscribe to all temperature measurement events regardless of source
+_, err := js.PullSubscribe("triple.measures_temperature.>", "TEMP_MONITOR")
 
-// Subscribe to all network connections
-_, err := js.PullSubscribe("triple.connected_to.>", "NETWORK_MONITOR") 
+// Subscribe to all salinity measurements
+_, err := js.PullSubscribe("triple.measures_salinity.>", "SALINITY_MONITOR") 
 
-// Subscribe to all process executions from Windows sources
-_, err := js.PullSubscribe("triple.executes.windows_security", "WINDOWS_PROCESS_MONITOR")
+// Subscribe to all wave height observations from buoy sources
+_, err := js.PullSubscribe("triple.observes_wave_height.ocean_buoy", "BUOY_WAVE_MONITOR")
 ```
 
 This approach allows consumers to:
+
 - Focus on specific relationship types
 - Process only the events relevant to their function
 - Scale independently based on subject volume
@@ -89,29 +90,29 @@ This subject hierarchy enables natural load distribution:
 
 ```go
 // For high-volume predicates, distribute processing across multiple consumers
-func NewProcessMonitorPool(ctx context.Context, nc *nats.Conn, poolSize int) ([]*ProcessExecutionMonitor, error) {
+func NewTemperatureMonitorPool(ctx context.Context, nc *nats.Conn, poolSize int) ([]*TemperatureSensorMonitor, error) {
     js, err := nc.JetStream()
-    if err != nil {
+    if (err != nil) {
         return nil, fmt.Errorf("getting jetstream context: %w", err)
     }
     
     // Create the consumer with explicit ack policy
     _, err = js.AddConsumer("TRIPLES", &nats.ConsumerConfig{
-        Durable:       "PROCESS_MONITOR",
+        Durable:       "TEMPERATURE_MONITOR",
         AckPolicy:     nats.AckExplicitPolicy,
-        FilterSubject: "triple.executes.>",
+        FilterSubject: "triple.measures_temperature.>",
         MaxAckPending: 1000,
         AckWait:       30 * time.Second,
     })
-    if err != nil && !errors.Is(err, nats.ErrConsumerNameExists) {
+    if (err != nil && !errors.Is(err, nats.ErrConsumerNameExists)) {
         return nil, fmt.Errorf("creating consumer: %w", err)
     }
     
     // Create pool of monitors sharing the same consumer
-    monitors := make([]*ProcessExecutionMonitor, poolSize)
-    for i := 0; i < poolSize; i++ {
-        monitor, err := NewProcessExecutionMonitor(ctx, js)
-        if err != nil {
+    monitors := make([]*TemperatureSensorMonitor, poolSize)
+    for (i := 0; i < poolSize; i++) {
+        monitor, err := NewTemperatureSensorMonitor(ctx, js)
+        if (err != nil) {
             return nil, fmt.Errorf("creating monitor %d: %w", i, err)
         }
         monitors[i] = monitor
@@ -127,7 +128,6 @@ The subject hierarchy enables precise filtering without wasting resources:
 
 ```go
 // Filter by specific predicates and sources
-// filepath: /Users/coby/Code/witfoo-dev/common/triple/processor/routing.go
 package processor
 
 import (
@@ -203,13 +203,12 @@ Triple-based architecture allows for dynamic subject routing based on message co
 
 ```go
 // GenerateTripleSubject generates a NATS subject for a triple
-// filepath: /Users/coby/Code/witfoo-dev/common/triple/subject/generator.go
 package subject
 
 import (
     "strings"
 
-    "github.com/witfoo/common/triple"
+    "github.com/witfoo/krapht/triple"
 )
 
 // GenerateTripleSubject creates a subject for publishing a triple
@@ -310,7 +309,6 @@ For high-volume deployments, predicate-based routing enables efficient stream pa
 
 ```go
 // ConfigureTripleStreams sets up optimized streams for different triple types
-// filepath: /Users/coby/Code/witfoo-dev/common/triple/stream/configurator.go
 package stream
 
 import (
@@ -364,29 +362,29 @@ func ConfigureTripleStreams(ctx context.Context, js nats.JetStreamContext, confi
 func DefaultTripleStreamConfigs() []StreamConfig {
     return []StreamConfig{
         {
-            Name:      "AUTHENTICATION",
-            Subjects:  []string{"triple.authenticated_to.>", "triple.uses_auth_type.>"},
+            Name:      "TEMPERATURE_MEASUREMENTS",
+            Subjects:  []string{"triple.measures_temperature.>", "triple.indicates_temperature_anomaly.>"},
+            MaxAge:    90 * 24 * time.Hour, // 90 days
+            Storage:   nats.FileStorage,
+            Replicas:  1,
+            Retention: nats.LimitsPolicy,
+            Discard:   nats.DiscardOld,
+            MaxBytes:  -1, // Unlimited
+        },
+        {
+            Name:      "SALINITY_MEASUREMENTS",
+            Subjects:  []string{"triple.measures_salinity.>"},
+            MaxAge:    60 * 24 * time.Hour, // 60 days
+            Storage:   nats.FileStorage,
+            Replicas:  1,
+            Retention: nats.LimitsPolicy,
+            Discard:   nats.DiscardOld,
+            MaxBytes:  -1, // Unlimited
+        },
+        {
+            Name:      "WAVE_OBSERVATIONS",
+            Subjects:  []string{"triple.observes_wave_height.>"},
             MaxAge:    30 * 24 * time.Hour, // 30 days
-            Storage:   nats.FileStorage,
-            Replicas:  1,
-            Retention: nats.LimitsPolicy,
-            Discard:   nats.DiscardOld,
-            MaxBytes:  -1, // Unlimited
-        },
-        {
-            Name:      "PROCESS_EXECUTION",
-            Subjects:  []string{"triple.executes.>"},
-            MaxAge:    14 * 24 * time.Hour, // 14 days
-            Storage:   nats.FileStorage,
-            Replicas:  1,
-            Retention: nats.LimitsPolicy,
-            Discard:   nats.DiscardOld,
-            MaxBytes:  -1, // Unlimited
-        },
-        {
-            Name:      "NETWORK_CONNECTIONS",
-            Subjects:  []string{"triple.connected_to.>"},
-            MaxAge:    7 * 24 * time.Hour, // 7 days
             Storage:   nats.FileStorage,
             Replicas:  1,
             Retention: nats.LimitsPolicy,
@@ -395,9 +393,9 @@ func DefaultTripleStreamConfigs() []StreamConfig {
         },
         // Default catch-all stream for other triples
         {
-            Name:      "TRIPLES_OTHER",
+            Name:      "OCEAN_DATA_OTHER",
             Subjects:  []string{"triple.>"},
-            MaxAge:    7 * 24 * time.Hour, // 7 days
+            MaxAge:    14 * 24 * time.Hour, // 14 days
             Storage:   nats.FileStorage,
             Replicas:  1,
             Retention: nats.LimitsPolicy,

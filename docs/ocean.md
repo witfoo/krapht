@@ -31,7 +31,7 @@ import (
   "time"
 
   "github.com/google/uuid"
-  "github.com/witfoo/common/triple/extraction"
+  "github.com/witfoo/krapht/triple/extraction"
 )
 
 // BuoyReading represents data from an oceanographic buoy

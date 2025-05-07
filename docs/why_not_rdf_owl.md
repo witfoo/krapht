@@ -1,23 +1,19 @@
-# Simple, yet detailed, versus complex
+# Why Not RDF and OWL?
 
-RDF and OWL solve many problems in theory. KraphT solves 80 percent of the interoperability and reasoning problems with 20 percent of the complexity.
+Some may argue that RDF, OWL, and SPARQL already solve the kinds of problems KraphT addresses. RDF and OWL solve many problems in theory. KraphT solves 80 percent of the interoperability and reasoning problems with 20 percent of the complexity.
 
-It provides a simpler, composable, and operationally efficient path for organizations that need structured reasoning but do not require formal ontologies or semantic web tooling.
+KraphT provides a simpler, composable, and operationally efficient path for organizations that need structured reasoning but do not require formal ontologies or semantic web tooling.
 
 KraphT can evolve toward formal semantics later, but it starts where most teams are today.
 
-## Why Not RDF and OWL?
-
-Some may argue that RDF, OWL, and SPARQL already solve the kinds of problems KraphT addresses. This is true in theory, but there are practical differences that shape KraphT’s design.
-
-### Valid Benefits of RDF/OWL
+## Valid Benefits of RDF/OWL
 
 - RDF and OWL are W3C standards with mature support.
 - Formal ontologies exist for many domains (e.g., SOSA/SSN for sensors).
 - SPARQL and OWL reasoners enable complex graph querying and inference.
 - These technologies align with FAIR data and Linked Open Data principles.
 
-### Why KraphT Takes a Simpler Path
+## Why KraphT Takes a Simpler Path
 
 1. **Developer Accessibility**
 
