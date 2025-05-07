@@ -19,7 +19,7 @@ import (
 // Source interface represents the start of the pipeline.
 // Extract method takes a context and returns a channel of type T.
 // The context is used in Source to close/drain a pipeline.
-type Source[T Readable] interface {
+type Source[T any] interface {
 	Extract(ctx context.Context, eventC chan<- Event) (out <-chan T)
 }
 
