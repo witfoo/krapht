@@ -27,7 +27,7 @@ flowchart LR
 
 The pipeline package is built on a foundation of interfaces that define behaviors rather than concrete implementations. This design follows the principle of "programming to an interface, not an implementation," which promotes flexibility, testability, and modularity in the codebase.
 
-These interfaces enable a form of polymorphism where any type that satisfies the contract can be used interchangeably within the pipeline, regardless of its internal implementation. 
+These interfaces enable a form of polymorphism where any type that satisfies the contract can be used interchangeably within the pipeline, regardless of its internal implementation.
 
 ```mermaid
 classDiagram
