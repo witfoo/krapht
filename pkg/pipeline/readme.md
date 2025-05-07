@@ -144,9 +144,58 @@ pipeline.SendEvent(eventC, pipeline.NewLogEvent(
 
 ```
 
+### Event Collector
+
+The pipeline provides an `EventCollector` component that centralizes event processing and handling. This collector creates a systematic way to process events from all pipeline components through configurable callbacks.
+
+```mermaid
+flowchart TB
+    A[Pipeline Components] -->|Emit Events| B[Event Channel]
+    B --> C[Event Collector]
+    C --> D[Worker Pool]
+    D --> E[Callbacks]
+    E --> F[Type-Specific Handlers]
+    E --> G[General Handlers]
+    
+    style A fill:#f4a261,stroke:#333,stroke-width:2px
+    style B fill:#2a9d8f,stroke:#333,stroke-width:2px
+    style C fill:#e76f51,stroke:#333,stroke-width:2px
+    style D fill:#4361ee,stroke:#333,stroke-width:2px
+    style F fill:#3a86ff,stroke:#333,stroke-width:2px
+    style G fill:#3a86ff,stroke:#333,stroke-width:2px
+```
+
+The EventCollector offers several benefits:
+
+Configurable Workers: Configure concurrent processing with multiple worker goroutines
+Buffered Collection: Control backpressure with adjustable channel buffer size
+Typed Callbacks: Register handlers for specific event types (errors, logs, metrics)
+General Callbacks: Process all events regardless of type
+Thread Safety: Properly synchronizes event processing across concurrent operations
+
+Example collector setup:
+
+```go
+collector := pipeline.NewEventCollector(
+    pipeline.WithBufferSize(100),
+    pipeline.WithWorkers(2),
+    pipeline.WithTypedCallback(pipeline.EventError, handleErrorEvent),
+    pipeline.WithTypedCallback(pipeline.EventLog, handleLogEvent),
+    pipeline.WithTypedCallback(pipeline.EventMetric, handleMetricEvent),
+)
+
+// Get event channel to pass to pipeline components
+eventChan := collector.Collect()
+
+// Ensure proper cleanup when done
+defer collector.Close()
+```
+
+The collector integrates with all pipeline components through a shared event channel, providing centralized monitoring and handling of operational events.
+
 ## Basic Usage Example
 
-Here's a simple example of creating a pipeline that reads from a mock source of ints, processes the data, and sends it to both a logger and a NATS stream:
+Here's a simple example of creating a pipeline that reads from a mock source of ints, processes the data, buffer, and logs the output:
 
 ```go
 // Example demonstrating how to build a data processing pipeline using the pipeline
@@ -237,6 +286,7 @@ func runPipeline(ctx context.Context) error {
     // Buffer the output to handle backpressure
     bufferedOut := buffer.Transform(flowOut, eventChan)
     // Load data into sink
+    // Blocks here until context is cancelled
     logger.Load(bufferedOut, eventChan)
   }()
 
