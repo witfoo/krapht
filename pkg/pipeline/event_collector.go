@@ -89,7 +89,7 @@ func NewEventCollector(opts ...EventCollectorOption) *EventCollector {
 // Collect returns a channel that collects events.
 // The context controls the lifecycle of the collection process.
 // It starts worker goroutines to process events concurrently.
-// The event channel is closed when the context is cancelled.
+// It is up to caller to close the Collector when done.
 func (c *EventCollector) Collect() chan<- Event {
 	// Check if the collector is already open
 	if c.isOpen.Load() {

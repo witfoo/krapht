@@ -27,7 +27,7 @@ flowchart LR
 
 The pipeline package is built on a foundation of interfaces that define behaviors rather than concrete implementations. This design follows the principle of "programming to an interface, not an implementation," which promotes flexibility, testability, and modularity in the codebase.
 
-These interfaces enable a form of polymorphism where any type that satisfies the contract can be used interchangeably within the pipeline, regardless of its internal implementation. This approach aligns with the Dependency Inversion Principle from SOLID design principles, allowing higher-level components to depend on abstractions rather than concrete implementations.
+These interfaces enable a form of polymorphism where any type that satisfies the contract can be used interchangeably within the pipeline, regardless of its internal implementation. 
 
 ```mermaid
 classDiagram
@@ -77,9 +77,9 @@ The simplest pipeline pattern connects one source to a sequence of flows and fin
 
 ```mermaid
 flowchart LR
-    A[UDP Source] -->|Extract| B[Parser Flow]
+    A[HTTP Source] -->|Extract| B[Parser Flow]
     B -->|Transform| C[Filter Flow]
-    C -->|Transform| D[Splunk Sink]
+    C -->|Transform| D[NATS Sink]
     
     style A fill:#f4a261,stroke:#333,stroke-width:2px
     style B fill:#2a9d8f,stroke:#333,stroke-width:2px
@@ -146,7 +146,7 @@ pipeline.SendEvent(eventC, pipeline.NewLogEvent(
 
 ## Basic Usage Example
 
-Here's a simple example of creating a pipeline that reads from UDP, processes the data, and sends it to both a logger and a broker stream:
+Here's a simple example of creating a pipeline that reads from a mock source of ints, processes the data, and sends it to both a logger and a NATS stream:
 
 ```go
 // Example demonstrating how to build a data processing pipeline using the pipeline
@@ -208,12 +208,13 @@ func runPipeline(ctx context.Context) error {
     return fmt.Errorf("failed to create data flow: %w", err)
   }
 
+  // Create a buffer to manage backpressure
+  buffer := flow.NewBuffer[string](100)
+
   // Create a logger sink
   logger := sink.NewLogger[string](log.New(os.Stdout, "PIPELINE: ", log.LstdFlags))
 
-  // Create a buffer to manage backpressure
-  buffer := flow.NewBuffer[string](100, time.Second)
-
+  
   // Create an event collector with callbacks for different event types
   collector := pipeline.NewEventCollector(
     pipeline.WithBufferSize(100),
@@ -222,9 +223,9 @@ func runPipeline(ctx context.Context) error {
     pipeline.WithTypedCallback(pipeline.EventLog, handleLogEvent),
     pipeline.WithTypedCallback(pipeline.EventMetric, handleMetricEvent),
   )
-
-  // Create channel for events from all components
+  // Create channel for each stage to use for sending events
   eventChan := collector.Collect(ctx)
+  // Clean up when done
   defer collector.Close()
 
   // Run the pipeline manually since we're using a simple topology
@@ -279,14 +280,12 @@ func handleMetricEvent(e pipeline.Event) {
 
 ### Sources
 
-- UDP Source: Listens on UDP port
-- TCP Source: Listens on TCP port
-- HTTP Server Source: Receives data via HTTP
-- Journal Source: Reads from systemd journal
-- NATS Stream Source: Consumes from JetStream subject
+- HTTP Server: Receives data via HTTP
+- NATS Stream: Consumes from JetStream subject
 
 ### Flows
 
+- Buffer: Very simple channel based buffer
 - Map: Transforms data
 - Filter: Filters data based on conditions
 - FilterMap: Combines filter and map
@@ -294,10 +293,9 @@ func handleMetricEvent(e pipeline.Event) {
 
 ### Sinks
 
-- Logger: Logs data
+- Logger: Logs prettified data
 - NoOp: Discards data
-- Splunk HEC: Sends data to Splunk
-- Broker Stream: Publishes to message broker
+- NATS Stream: Publishes to NATS stream
 
 ## Best Practices
 
