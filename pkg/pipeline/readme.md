@@ -167,11 +167,11 @@ flowchart TB
 
 The EventCollector offers several benefits:
 
-Configurable Workers: Configure concurrent processing with multiple worker goroutines
-Buffered Collection: Control backpressure with adjustable channel buffer size
-Typed Callbacks: Register handlers for specific event types (errors, logs, metrics)
-General Callbacks: Process all events regardless of type
-Thread Safety: Properly synchronizes event processing across concurrent operations
+- Configurable Workers: Configure concurrent processing with multiple worker goroutines
+- Buffered Collection: Control backpressure with adjustable channel buffer size
+- Typed Callbacks: Register handlers for specific event types (errors, logs, metrics)
+- General Callbacks: Process all events regardless of type
+- Thread Safety: Properly synchronizes event processing across concurrent operations
 
 Example collector setup:
 
